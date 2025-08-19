@@ -5,7 +5,6 @@ import { GatewayService, LuigiCoreService } from '@openmfp/portal-ui-lib';
 describe('NodeChangeHookConfigServiceImpl', () => {
   let service: NodeChangeHookConfigServiceImpl;
   let mockLuigiCoreService: any;
-  let mockGatewayService: any;
 
   beforeEach(() => {
     mockLuigiCoreService = {
@@ -15,15 +14,10 @@ describe('NodeChangeHookConfigServiceImpl', () => {
       getGlobalContext: jest.fn().mockReturnValue({ organization: 'org1' }),
     };
 
-    mockGatewayService = {
-      updateCrdGatewayUrlWithEntityPath: jest.fn(),
-    };
-
     TestBed.configureTestingModule({
       providers: [
         NodeChangeHookConfigServiceImpl,
         { provide: LuigiCoreService, useValue: mockLuigiCoreService },
-        { provide: GatewayService, useValue: mockGatewayService },
       ],
     });
 
@@ -43,70 +37,5 @@ describe('NodeChangeHookConfigServiceImpl', () => {
     expect(mockLuigiCoreService.navigation().navigate).toHaveBeenCalledWith(
       '/some/path',
     );
-  });
-
-  it('should call update the crd gateway url constructed kcp path, based on the succession of entities read', () => {
-    const prevNode = {} as any;
-    const nextNode = {
-      context: {
-        entityContext: {
-          account: {
-            id: 'child',
-          },
-        },
-      },
-      parent: {
-        context: {
-          entityContext: {
-            account: {
-              id: 'parent-2',
-            },
-          },
-        },
-        parent: {
-          context: {},
-          parent: {
-            context: {
-              entityContext: {
-                account: {
-                  id: 'parent-1',
-                },
-              },
-            },
-            parent: {
-              context: {
-                entityContext: {
-                  account: {
-                    id: 'parent-0',
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    } as any;
-
-    service.nodeChangeHook(prevNode, nextNode);
-
-    expect(
-      mockGatewayService.updateCrdGatewayUrlWithEntityPath,
-    ).toHaveBeenCalledWith('root:orgs:org1:parent-0:parent-1:parent-2:child');
-  });
-
-  it('should use context.kcpPath if present', () => {
-    const prevNode = {} as any;
-    const nextNode = {
-      context: {
-        kcpPath: 'custom/path',
-      },
-      parent: null,
-    } as any;
-
-    service.nodeChangeHook(prevNode, nextNode);
-
-    expect(
-      mockGatewayService.updateCrdGatewayUrlWithEntityPath,
-    ).toHaveBeenCalledWith('custom/path');
   });
 });

@@ -19,30 +19,24 @@ export class LuigiExtendedGlobalContextConfigServiceImpl
 
   async createLuigiExtendedGlobalContext(): Promise<Record<string, any>> {
     const portalConfig = await this.configService.getPortalConfig();
-    const entityId = (await this.envConfigService.getEnvConfig()).organization;
+    const entityId = (await this.envConfigService.getEnvConfig())[
+      'organization'
+    ];
     const operation = 'core_platform_mesh_io';
-    const kind = 'Account';
-    const queryPart = '{ metadata { name annotations } }';
 
     try {
-      const resource = await firstValueFrom(
-        this.resourceService.read(
-          entityId,
-          operation,
-          kind,
-          `query ($name: String!) { ${operation} { ${kind}(name: $name) ${queryPart} }}`,
-          {
-            portalContext: {
-              crdGatewayApiUrl: portalConfig.portalContext['crdGatewayApiUrl'],
-            },
-            token: this.authService.getToken(),
-            accountId: entityId,
+      const accountInfo = await firstValueFrom(
+        this.resourceService.readAccountInfo({
+          portalContext: {
+            crdGatewayApiUrl: portalConfig.portalContext['crdGatewayApiUrl'],
           },
-        ),
+          token: this.authService.getToken(),
+          accountId: entityId,
+        }),
       );
 
       const resourceKcpIoClusterAnnotation =
-        resource?.metadata?.annotations?.['kcp.io/cluster'];
+        accountInfo?.metadata?.annotations?.['kcp.io/cluster'];
       if (!resourceKcpIoClusterAnnotation) {
         console.warn(
           `Cluster annotation (kcp.io/cluster) missing for resource: ${entityId}`,
@@ -51,7 +45,9 @@ export class LuigiExtendedGlobalContextConfigServiceImpl
       }
 
       return {
+        organization: entityId,
         organizationId: `${resourceKcpIoClusterAnnotation}/${entityId}`,
+        kcpCA: btoa(accountInfo?.spec?.clusterInfo?.ca),
         entityId: `${resourceKcpIoClusterAnnotation}/${entityId}`, // if no entity selected the entityId is the same as the organizationId
       };
     } catch (e) {
