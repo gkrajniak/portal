@@ -4,10 +4,11 @@ import {
   AccountEntityContextProvider,
   AuthCallbackProvider,
   IAMGraphQlService,
+  KcpKubernetesService,
   KubernetesServiceProvidersService,
-  OpenmfpPortalContextService,
   PMAuthConfigProvider,
-  RequestContextProviderImpl,
+  PMPortalContextService,
+  PMRequestContextProvider,
 } from '@platform-mesh/portal-server-lib/portal-options';
 import { config } from 'dotenv';
 import * as path from 'node:path';
@@ -27,16 +28,17 @@ const portalOptions: PortalModuleOptions = {
     '../..',
     'frontend/dist/frontend/browser',
   ),
-  requestContextProvider: RequestContextProviderImpl,
-  portalContextProvider: OpenmfpPortalContextService,
+  requestContextProvider: PMRequestContextProvider,
+  portalContextProvider: PMPortalContextService,
   entityContextProviders: {
     account: AccountEntityContextProvider,
   },
   additionalProviders: [
+    KcpKubernetesService,
     AccountEntityContextProvider,
-    OpenmfpPortalContextService,
+    PMPortalContextService,
     IAMGraphQlService,
-    RequestContextProviderImpl,
+    PMRequestContextProvider,
     PMAuthConfigProvider,
   ],
   serviceProviderService: KubernetesServiceProvidersService,
