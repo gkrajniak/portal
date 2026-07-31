@@ -13,6 +13,7 @@ import {
   NavigationRedirectStrategyServiceImpl,
   NodeChangeHookConfigServiceImpl,
   NodeContextProcessingServiceImpl,
+  OpenPersistentPanelListener,
   UserProfileConfigServiceImpl,
 } from '@platform-mesh/portal-ui-lib/portal-options';
 import { routes } from './app/app.routes';
@@ -22,6 +23,7 @@ import { PMCustomGlobalNodesService } from './app/services/pm-custom-global-node
 const portalOptions: PortalOptions = {
   staticSettingsConfigService: PMStaticSettingsConfigService,
   nodeChangeHookConfigService: NodeChangeHookConfigServiceImpl,
+  customMessageListeners: [OpenPersistentPanelListener],
   customGlobalNodesService: PMCustomGlobalNodesService,
   nodeContextProcessingService: NodeContextProcessingServiceImpl,
   luigiExtendedGlobalContextConfigService:
