@@ -246,13 +246,13 @@ git push origin v1.2.0
 - Tag a commit on `main`, or on a maintenance branch `release/X.Y` for patch releases of an older version. A maintenance branch only accepts `X.Y.*` versions of its own line.
 - The version must be higher than the last release on the same branch.
 
-For every tag, the release workflow pushes and signs the image `ghcr.io/platform-mesh/portal:<tag>`, publishes its SBOM and OCM component, updates the `portal` chart's `appVersion` in [platform-mesh/platform-mesh](https://github.com/platform-mesh/platform-mesh) and creates a GitHub release with notes generated from the commit titles:
+For every tag, the release workflow pushes and signs the image `ghcr.io/platform-mesh/portal:<tag>`, publishes its SBOM and OCM component and creates a GitHub release with notes generated from the commit titles. Only a release from `main` updates the `portal` chart's `appVersion` in [platform-mesh/platform-mesh](https://github.com/platform-mesh/platform-mesh), so release candidates and maintenance releases do not change the chart:
 
-| Tag | Branch | GitHub release |
-|---|---|---|
-| `vX.Y.Z` | `main` | latest |
-| `vX.Y.Z-rc.N` | `main` or `release/X.Y` | pre-release |
-| `vX.Y.Z` | `release/X.Y` | release |
+| Tag | Branch | GitHub release | Chart `appVersion` |
+|---|---|---|---|
+| `vX.Y.Z` | `main` | latest | updated |
+| `vX.Y.Z-rc.N` | `main` or `release/X.Y` | pre-release | unchanged |
+| `vX.Y.Z` | `release/X.Y` | release | unchanged |
 
 ## Issues
 We use GitHub issues to track bugs. Please ensure your description is
