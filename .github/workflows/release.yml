@@ -14,18 +14,18 @@ concurrency:
 
 jobs:
   version:
-    uses: platform-mesh/.github/.github/workflows/job-tag-version.yml@6c3ad03c5a50f649d5d3f45aeb039793816b408d
+    uses: platform-mesh/.github/.github/workflows/job-tag-version.yml@2baf2ece1faa3b2f54670e25655c5d2e608d7794
     permissions:
       contents: read
 
   test:
     needs: [version]
-    uses: platform-mesh/.github/.github/workflows/job-node-test.yml@6c3ad03c5a50f649d5d3f45aeb039793816b408d
+    uses: platform-mesh/.github/.github/workflows/job-node-test.yml@2baf2ece1faa3b2f54670e25655c5d2e608d7794
     secrets: inherit # zizmor: ignore[secrets-inherit]
 
   docker-build-push:
     needs: [version, test]
-    uses: platform-mesh/.github/.github/workflows/job-docker-build-push.yml@6c3ad03c5a50f649d5d3f45aeb039793816b408d
+    uses: platform-mesh/.github/.github/workflows/job-docker-build-push.yml@2baf2ece1faa3b2f54670e25655c5d2e608d7794
     secrets: inherit # zizmor: ignore[secrets-inherit]
     permissions:
       contents: write # Needed to update release artifacts
@@ -39,7 +39,7 @@ jobs:
 
   update-version:
     needs: [version, docker-build-push]
-    uses: platform-mesh/.github/.github/workflows/job-chart-version-update.yml@6c3ad03c5a50f649d5d3f45aeb039793816b408d
+    uses: platform-mesh/.github/.github/workflows/job-chart-version-update.yml@2baf2ece1faa3b2f54670e25655c5d2e608d7794
     secrets: inherit # zizmor: ignore[secrets-inherit]
     with:
       appVersion: ${{ needs.version.outputs.tag }}
@@ -48,7 +48,7 @@ jobs:
 
   sbom:
     needs: [version, docker-build-push]
-    uses: platform-mesh/.github/.github/workflows/job-sbom.yml@6c3ad03c5a50f649d5d3f45aeb039793816b408d
+    uses: platform-mesh/.github/.github/workflows/job-sbom.yml@2baf2ece1faa3b2f54670e25655c5d2e608d7794
     permissions:
       contents: read # Needed to read repository contents
       packages: read # Needed to pull the image to generate the SBOM
@@ -57,7 +57,7 @@ jobs:
 
   image-ocm:
     needs: [version, docker-build-push, sbom]
-    uses: platform-mesh/.github/.github/workflows/job-image-ocm.yml@6c3ad03c5a50f649d5d3f45aeb039793816b408d
+    uses: platform-mesh/.github/.github/workflows/job-image-ocm.yml@2baf2ece1faa3b2f54670e25655c5d2e608d7794
     secrets: inherit # zizmor: ignore[secrets-inherit]
     permissions:
       contents: read # Needed to read repository contents
@@ -70,7 +70,7 @@ jobs:
 
   scan-sbom:
     needs: [version, docker-build-push, sbom, image-ocm]
-    uses: platform-mesh/.github/.github/workflows/job-trivy-sbom.yml@6c3ad03c5a50f649d5d3f45aeb039793816b408d
+    uses: platform-mesh/.github/.github/workflows/job-trivy-sbom.yml@2baf2ece1faa3b2f54670e25655c5d2e608d7794
     permissions:
       contents: read # Needed to read repository contents
       packages: read # Needed to pull the image referenced by the SBOM
@@ -80,7 +80,7 @@ jobs:
 
   github-release:
     needs: [version, docker-build-push]
-    uses: platform-mesh/.github/.github/workflows/job-github-release.yml@6c3ad03c5a50f649d5d3f45aeb039793816b408d
+    uses: platform-mesh/.github/.github/workflows/job-github-release.yml@2baf2ece1faa3b2f54670e25655c5d2e608d7794
     permissions:
       contents: write # Needed to create the GitHub release
     with:
